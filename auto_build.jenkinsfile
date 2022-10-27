@@ -1,0 +1,213 @@
+node("MAC") {
+    echo "run_mode: " + run_mode
+    echo "build_os: " + build_os
+    echo "选择对比差分版本: " + diff_version
+    echo "svn_client_path: " + svn_client_path
+    echo "svn_sql_path: " + svn_sql_path
+    echo "del_png_jpg: " + del_png_jpg
+    echo "del_ktx: " + del_ktx
+    echo "web_pkg_upload: " + web_pkg_upload
+    echo "version_path: " + version_path
+    echo "versionCode: " + versionCode
+    echo "versionName: " + versionName
+    echo "gameVersionCode: " + gameVersionCode
+    echo "gameVersionName: " + gameVersionName
+    echo "android_build_type: " + android_build_type
+    echo "cacheurl: " + cacheurl
+    echo "android_gitbranch: " + android_gitbranch
+    echo "ios_gitbranch: " + ios_gitbranch
+    node("MAC"){
+    stage("parameters_check"){
+        build job : 'sqh5_client_autobuild_parameter_check', parameters:[
+            [$class: 'StringParameterValue', name: 'run_mode', value: run_mode],
+            [$class: 'StringParameterValue', name: 'push_server', value: push_server],
+            [$class: 'StringParameterValue', name: 'build_os', value: build_os],
+            [$class: 'StringParameterValue', name: 'diff_version', value: diff_version],
+            [$class: 'StringParameterValue', name: 'svn_client_path', value: svn_client_path],
+            [$class: 'BooleanParameterValue', name: 'del_png_jpg', value: del_png_jpg],
+            [$class: 'BooleanParameterValue', name: 'web_pkg_upload', value: web_pkg_upload],
+            [$class: 'StringParameterValue', name: 'version_path', value: version_path],
+            [$class: 'StringParameterValue', name: 'versionCode', value: versionCode],
+            [$class: 'StringParameterValue', name: 'versionName', value: versionName],
+            [$class: 'StringParameterValue', name: 'gameVersionCode', value: gameVersionCode],
+            [$class: 'StringParameterValue', name: 'gameVersionName', value: gameVersionName],
+            [$class: 'StringParameterValue', name: 'android_build_type', value: android_build_type],
+            [$class: 'StringParameterValue', name: 'android_build_type', value: android_build_type],
+            [$class: 'StringParameterValue', name: 'svn_sql_path', value: svn_sql_path],
+            [$class: 'StringParameterValue', name: 'del_ktx', value: del_ktx],
+            [$class: 'StringParameterValue', name: 'cacheurl', value: cacheurl],
+            [$class: 'StringParameterValue', name: 'android_gitbranch', value: android_gitbranch],
+            [$class: 'StringParameterValue', name: 'ios_gitbranch', value: ios_gitbranch],
+            [$class: 'StringParameterValue', name: 'android_copy_res_file', value: android_copy_res_file],
+            [$class: 'StringParameterValue', name: 'ios_copy_res_file', value: ios_copy_res_file],
+            [$class: 'StringParameterValue', name: '渠道参数', value: 渠道参数]
+        ]
+    }
+    stage("build_web"){
+        build job : 'sqh5_client_autobuild_web', parameters:[
+            [$class: 'StringParameterValue', name: 'run_mode', value: run_mode],
+            [$class: 'StringParameterValue', name: 'svn_client_path', value: svn_client_path],
+            [$class: 'StringParameterValue', name: 'version_path', value: version_path],
+            [$class: 'StringParameterValue', name: 'svn_sql_path', value: svn_sql_path],
+            [$class: 'StringParameterValue', name: 'versionName', value: versionName],
+            [$class: 'StringParameterValue', name: 'del_ktx', value: del_ktx],
+            [$class: 'StringParameterValue', name: 'push_server', value: push_server],
+            [$class: 'StringParameterValue', name: 'gameVersionName', value: versionName],
+            [$class: 'BooleanParameterValue', name: 'del_png_jpg', value: del_png_jpg],
+            [$class: 'StringParameterValue', name: 'build_os', value: build_os],
+            [$class: 'StringParameterValue', name: 'diff_version', value: diff_version],
+            [$class: 'BooleanParameterValue', name: 'web_pkg_upload', value: web_pkg_upload],
+        ]
+    }
+    if(build_os == "all"){
+
+        stage ("build_android"){
+            echo "build_apk"
+            build job : 'sqh5_client_autobuild_android',parameters:[
+                [$class: 'StringParameterValue', name: 'cacheurl', value: cacheurl],
+                [$class: 'StringParameterValue', name: 'versionCode', value: versionCode],
+                [$class: 'StringParameterValue', name: 'svn_client_path', value: svn_client_path],
+                [$class: 'StringParameterValue', name: 'versionName', value: versionName],
+                [$class: 'StringParameterValue', name: 'version_path', value: version_path],
+                [$class: 'StringParameterValue', name: 'gameVersionCode', value: gameVersionCode],
+                [$class: 'StringParameterValue', name: 'gameVersionName', value: gameVersionName],
+                [$class: 'StringParameterValue', name: 'android_build_type', value: android_build_type],
+                [$class: 'StringParameterValue', name: 'android_gitbranch', value: android_gitbranch],
+                [$class: 'StringParameterValue', name: 'android_copy_res_file', value: android_copy_res_file],
+                [$class: 'StringParameterValue', name: '渠道参数', value: 渠道参数]
+            ]
+        }
+        stage ("build_ios"){
+            echo "build_ipa"
+            build job : "sqh5_client_autobuild_ios",parameters:[
+                [$class: 'StringParameterValue', name: 'svn_client_path', value: svn_client_path],
+                [$class: 'StringParameterValue', name: 'ios_gitbranch', value: ios_gitbranch],
+                [$class: 'StringParameterValue', name: 'ios_copy_res_file', value: ios_copy_res_file],
+                [$class: 'StringParameterValue', name: 'ios_build_type', value: ios_build_type],
+            ]
+        }
+    }
+    else if(build_os == "android"){
+        stage ("build_android"){
+            echo "build_apk"
+            build job : 'sqh5_client_autobuild_android',parameters:[
+                [$class: 'StringParameterValue', name: 'cacheurl', value: cacheurl],
+                [$class: 'StringParameterValue', name: 'versionCode', value: versionCode],
+                [$class: 'StringParameterValue', name: 'svn_client_path', value: svn_client_path],
+                [$class: 'StringParameterValue', name: 'versionName', value: versionName],
+                [$class: 'StringParameterValue', name: 'version_path', value: version_path],
+                [$class: 'StringParameterValue', name: 'gameVersionCode', value: gameVersionCode],
+                [$class: 'StringParameterValue', name: 'gameVersionName', value: gameVersionName],
+                [$class: 'StringParameterValue', name: 'android_build_type', value: android_build_type],
+                [$class: 'StringParameterValue', name: 'android_gitbranch', value: android_gitbranch],
+                [$class: 'StringParameterValue', name: 'android_copy_res_file', value: android_copy_res_file],
+                [$class: 'StringParameterValue', name: '渠道参数', value: 渠道参数]
+            ]
+        }
+        stage ("build_ios"){
+            echo "not_build_ipa"
+        }
+    }
+    else if(build_os == "ios"){
+        stage ("build_android"){
+            echo "build_android"
+        }
+        stage ("build_ios"){
+            echo "build_ipa"
+            build job : "sqh5_client_autobuild_ios",parameters:[
+                [$class: 'StringParameterValue', name: 'svn_client_path', value: svn_client_path],
+                [$class: 'StringParameterValue', name: 'ios_gitbranch', value: ios_gitbranch],
+                [$class: 'StringParameterValue', name: 'ios_copy_res_file', value: ios_copy_res_file],
+                [$class: 'StringParameterValue', name: 'ios_build_type', value: ios_build_type],
+                ]
+            }
+
+    }
+    else{
+        stage ("build_android"){
+            echo "not_build_apk"
+        }
+       stage ("build_ios"){
+            echo "not_build_ipa"
+        }
+    }
+//     stage("build_web"){
+//                 build job: 'sqh5_client_autobuild_web', parameters:[
+//                     [$class: 'StringParameterValue', name: 'run_mode', value: run_mode],
+//                     [$class: 'StringParameterValue', name: 'diff_version', value: diff_version],
+//                     [$class: 'StringParameterValue', name: 'svn_client_path', value: svn_client_path],
+//                     [$class: 'BooleanParameterValue', name: 'web_pkg_upload', value: web_pkg_upload],
+//                     [$class: 'StringParameterValue', name: 'version_path', value: version_path],
+//                     [$class: 'StringParameterValue', name: 'versionName', value: versionName]
+//                 ]
+//             }
+//         if(run_mode == 'full' | run_mode == 'diff'){
+//             stage("build_web"){
+//                 build job: 'sqh5_client_autobuild_web', parameters:[
+//                     [$class: 'StringParameterValue', name: 'run_mode', value: run_mode],
+//                     [$class: 'StringParameterValue', name: 'diff_version', value: diff_version],
+//                     [$class: 'StringParameterValue', name: 'svn_client_path', value: svn_client_path],
+//                     [$class: 'BooleanParameterValue', name: 'web_pkg_upload', value: web_pkg_upload],
+//                     [$class: 'StringParameterValue', name: 'version_path', value: version_path],
+//                     [$class: 'StringParameterValue', name: 'versionName', value: versionName]
+//                 ]
+//             }
+//         }
+//         if(run_mode == 'pkg'){
+//             stage("build_web"){
+//                 echo "出客户端包，跳过web构建"
+//             }
+//         }
+//         if(build_os == 'all'){
+//             stage("build_android"){
+//                 build job: 'sqh5_client_autobuild_android', parameters:[
+//                     [$class: 'StringParameterValue', name: 'versionCode', value: versionCode],
+//                     [$class: 'StringParameterValue', name: 'versionName', value: versionName],
+//                     [$class: 'StringParameterValue', name: 'gameVersionCode', value: gameVersionCode],
+//                     [$class: 'StringParameterValue', name: 'gameVersionName', value: gameVersionName],
+//                     [$class: 'StringParameterValue', name: 'android_build_type', value: android_build_type],
+//                     [$class: 'StringParameterValue', name: 'android_gitbranch', value: android_gitbranch],
+//                     [$class: 'StringParameterValue', name: 'copy_res_file', value: copy_res_file],
+//                     [$class: 'StringParameterValue', name: '渠道参数', value: 渠道参数]
+//                 ]
+//             }
+//             stage("build_ios"){
+//                 build job: 'sqh5_client_autobuild_ios'
+//             }
+//         }
+//         if(build_os == 'android'){
+//             stage("build_android"){
+//                 build job: 'sqh5_client_autobuild_android', parameters:[
+//                     [$class: 'StringParameterValue', name: 'versionCode', value: versionCode],
+//                     [$class: 'StringParameterValue', name: 'versionName', value: versionName],
+//                     [$class: 'StringParameterValue', name: 'gameVersionCode', value: gameVersionCode],
+//                     [$class: 'StringParameterValue', name: 'gameVersionName', value: gameVersionName],
+//                     [$class: 'StringParameterValue', name: 'android_build_type', value: android_build_type],
+//                     [$class: 'StringParameterValue', name: 'android_gitbranch', value: android_gitbranch],
+//                     [$class: 'StringParameterValue', name: 'copy_res_file', value: copy_res_file],
+//                     [$class: 'StringParameterValue', name: '渠道参数', value: 渠道参数]
+//                 ]
+//             }
+//             stage("build_ios"){
+//                 echo "跳过iOS打包"
+//             }
+//         }
+//         if(build_os == 'ios'){
+//             stage("build_android"){
+//                 echo "跳过Android打包"
+//             }
+//             stage("build_ios"){
+//                 build job: 'sqh5_client_autobuild_ios'
+//             }
+//         }
+//         if(build_os == 'not_build'){
+//             stage("build_android"){
+//                 echo "跳过Android打包"
+//             }
+//             stage("build_ios"){
+//                 echo "跳过iOS打包"
+//             }
+//         }
+
+    }
+}
